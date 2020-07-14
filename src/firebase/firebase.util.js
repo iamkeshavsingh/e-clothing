@@ -41,6 +41,31 @@ export const storeUser = async (userAuth, additional) => {
     return userRef;
 };
 
+export const addCollectionAndDocuments = (collectionKey, objectToAdd) => {
+    const collectionRef = firestore.collection(collectionKey);
+
+    const batch = firestore.batch();
+
+    objectToAdd.forEach(obj => {
+        const newDoc = collectionRef.doc();
+        batch.set(newDoc, obj);
+    });
+
+    batch.commit();
+};
+
+export const transformCollectionToMap = collections => {
+    return collections.docs.map(doc => {
+        const { title, items } = doc.data();
+        return {
+            routeName: encodeURI(title.toLowerCase()),
+            id: doc.id,
+            title,
+            items
+        };
+    });
+};
+
 const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({ propmt: 'select_account' });
 
